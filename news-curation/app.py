@@ -25,4 +25,4 @@ def schedule_curation(interval: int):
 
 
 if __name__ == "__main__":
-    schedule_curation(1)
+    schedule_curation(15)
