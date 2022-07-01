@@ -24,5 +24,11 @@ def schedule_curation(interval: int):
         schedule.run_pending()
 
 
+# TODO
+# set url as the primary key.
+# think of a way to prevent same articles.
+# discard articles less than 45 words.
+# shorten articles more than 1000 words. Split by punctuation too.
+
 if __name__ == "__main__":
     schedule_curation(15)

@@ -3,6 +3,7 @@ from newsapi import NewsApiClient
 from newspaper import Article
 from secret_keys import api_key
 import pytz
+import re
 
 # secret_keys contains the api_key
 api = NewsApiClient(api_key=api_key)
@@ -57,13 +58,17 @@ def get_full_description(articles: list):
     articles -> The list of articles
     """
 
+    def truncate_text(text):
+        while len(re.findall(r"\w+(?:'\w+)?|[^\w\s]", text)) > 1000:
+            text = text[:text.rindex("\n")]
+        return text
+
     for article in articles:
         url = article['url']
         news_article = Article(url)
         news_article.download()
         news_article.parse()
-        article['content'] = news_article.text
-        #article['tags'] = news_article.tags
+        article['content'] = truncate_text(news_article.text)
         article['source']['source_url'] = news_article.source_url
     return articles
 
