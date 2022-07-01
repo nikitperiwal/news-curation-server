@@ -17,7 +17,10 @@ def persist_to_mongo(items: list, collection_name: str, db_name: str = constants
 
     db = client[db_name]
     collection = db[collection_name]
-    collection.insert_many(items)
+    try:
+        collection.insert_many(items, ordered=False)
+    except Exception as e:
+        print("An exception occurred :", e)
 
 
 def read_from_mongo(collection_name: str, db_name: str = "news_db"):
