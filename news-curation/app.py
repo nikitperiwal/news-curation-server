@@ -2,19 +2,17 @@ from datetime import datetime
 from get_news import curate_news
 import mongo_utils
 import schedule
-
-collection = "curated_news"
+import constants
 
 
 def start_curating(interval: int):
-    time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-    print("Curating at: ", time)
+    print("Curating at: ", datetime.now().strftime(constants.DATETIME_TO_STRING))
     curated_news = curate_news(interval=interval)
     print("No. of articles scraped: ", len(curated_news))
-    mongo_utils.persist_to_mongo(items=curated_news, collection_name=collection)
+    mongo_utils.persist_to_mongo(items=curated_news, collection_name=constants.CURATED_TABLE)
 
 
-def schedule_curation(interval: int):
+def schedule_curation(interval: int = constants.SCHEDULE_MINUTES):
     schedule.every(interval).minutes.do(
         start_curating,
         interval=interval
@@ -28,7 +26,6 @@ def schedule_curation(interval: int):
 # set url as the primary key.
 # think of a way to prevent same articles.
 # discard articles less than 45 words.
-# shorten articles more than 1000 words. Split by punctuation too.
 
 if __name__ == "__main__":
-    schedule_curation(15)
+    schedule_curation()

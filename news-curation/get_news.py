@@ -1,52 +1,45 @@
 from datetime import datetime, timedelta
 from newsapi import NewsApiClient
 from newspaper import Article
-from secret_keys import api_key
-import pytz
+import constants
 import re
 
 # secret_keys contains the api_key
-api = NewsApiClient(api_key=api_key)
+api = NewsApiClient(api_key=constants.NEWS_API_KEY)
 
 
-def get_sources(lang: str, country: str, limit: int) -> list:
+def get_sources() -> list:
     """
-    Fetch the news sources based on language and/or country
-
-    Parameters
-    ----------
-    lang    -> Find sources that display news in a specific language (2-letter ISO code of the language).
-    country -> Find sources that display news in a specific country (2-letter code of the country).
-    limit   -> The maximum amount of sources to return
-
-    Returns
-    -------
-    sources -> The list of source id's truncated to the limit set
+    Returns the list of source id's truncated to the limit set
     """
 
     sources = []
-    for src in api.get_sources(language=lang, country=country)['sources']:
+    for src in api.get_sources(language=constants.LANGUAGE, country=constants.COUNTRY)['sources']:
         sources.append(src['id'])
-    return sources[:limit]
+    return sources[:constants.SOURCE_LIMIT]
 
 
-def get_news_from_sources(lang: str, country: str, limit: int, from_time: datetime) -> list:
+def get_news_from_sources(from_time: datetime) -> list:
     """
     Retrieve the news articles using NEWS API
 
     Parameters
     ----------
-    lang    -> Find news in a specific language (2-letter ISO code of the language).
-    country -> Find news from a specific country (2-letter code of the country).
-    limit   -> The maximum amount of sources.
+    from_time: Time to get news from.
 
     Returns
     -------
-    articles -> A list of news articles.
+    articles: A list of news articles.
     """
-    sources = get_sources(lang, country, limit)
+
+    sources = get_sources()
     sources = ",".join(sources)
-    return api.get_everything(sources=sources, from_param=from_time, page_size=100, language=lang)['articles']
+    return api.get_everything(
+        sources=sources,
+        from_param=from_time,
+        page_size=100,
+        language=constants.LANGUAGE
+    )['articles']
 
 
 def get_full_description(articles: list):
@@ -55,11 +48,11 @@ def get_full_description(articles: list):
 
     Parameters
     ----------
-    articles -> The list of articles
+    articles: The list of articles
     """
 
     def truncate_text(text):
-        while len(re.findall(r"\w+(?:'\w+)?|[^\w\s]", text)) > 1000:
+        while len(re.findall(constants.SPLIT_REGEX, text)) > constants.MAX_ARTICLE_LENGTH:
             text = text[:text.rindex("\n")]
         return text
 
@@ -73,28 +66,17 @@ def get_full_description(articles: list):
     return articles
 
 
-def curate_news(interval: int, lang: str = "en", country: str = "in", limit: int = 25):
+def curate_news(interval: int):
     """
     Retrieve the news and store the news into the database.
 
     Parameters
     ----------
-    interval -> The time interval of the scheduler in minutes.
-    lang     -> Find news in a specific language (2-letter ISO code of the language).
-    country  -> Find news from a specific country (2-letter code of the country).
-    limit    -> The maximum amount of sources.
+    interval: The time interval of the scheduler in minutes.
     """
 
     # Selects a 'from_time' from the last curation.
-    utc_offset = pytz.timezone('Asia/Kolkata')._utcoffset
-    from_time = datetime.now() - utc_offset - timedelta(hours=1, minutes=interval)
+    from_time = datetime.now() - constants.UTC_OFFSET - timedelta(hours=1, minutes=interval)
 
-    articles = get_news_from_sources(lang=lang, country=country, limit=limit, from_time=from_time)
+    articles = get_news_from_sources(from_time=from_time)
     return get_full_description(articles)
-
-
-if __name__ == "__main__":
-    from pprint import pprint
-    for x in curate_news(1, "en", "in", 5):
-        pprint(x)
-        print("\n\n")
