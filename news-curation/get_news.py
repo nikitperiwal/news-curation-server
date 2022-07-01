@@ -72,7 +72,9 @@ def reformat_articles(articles: list):
 
     def truncate_text(text):
         while len(re.findall(constants.SPLIT_REGEX, text)) > constants.MAX_ARTICLE_LENGTH:
-            text = text[:text.rindex("\n")]
+            index = text.rfind(".")
+            index = index*10 if index == -1 else index
+            text = text[:index]
         return text
 
     new_list = []
@@ -102,4 +104,6 @@ def curate_news(interval: int):
     from_time = datetime.now() - constants.UTC_OFFSET - timedelta(hours=1, minutes=interval)
 
     articles = get_news_from_sources(from_time=from_time)
-    return get_full_description(articles)
+    articles = get_full_description(articles)
+    articles = reformat_articles(articles)
+    return articles
