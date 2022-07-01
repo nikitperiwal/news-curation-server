@@ -51,19 +51,42 @@ def get_full_description(articles: list):
     articles: The list of articles
     """
 
-    def truncate_text(text):
-        while len(re.findall(constants.SPLIT_REGEX, text)) > constants.MAX_ARTICLE_LENGTH:
-            text = text[:text.rindex("\n")]
-        return text
-
     for article in articles:
         url = article['url']
         news_article = Article(url)
         news_article.download()
         news_article.parse()
-        article['content'] = truncate_text(news_article.text)
-        article['source']['source_url'] = news_article.source_url
+        article['content'] = news_article.text
+        article['source_url'] = news_article.source_url
     return articles
+
+
+def reformat_articles(articles: list):
+    """
+    Reformat the article dict to rename and restructure keys.
+
+    Parameters
+    ----------
+    articles: The list of articles
+    """
+
+    def truncate_text(text):
+        while len(re.findall(constants.SPLIT_REGEX, text)) > constants.MAX_ARTICLE_LENGTH:
+            text = text[:text.rindex("\n")]
+        return text
+
+    new_list = []
+    for article in articles:
+        new_list.append({
+            "title": article["title"],
+            "content": truncate_text(article["content"]),
+            "datetime": article["publishedAt"],
+            "source": article["source"]["name"],
+            "source_url": article["source_url"],
+            "image_url": article["urlToImage"],
+            "article_url": article["url"],
+        })
+    return new_list
 
 
 def curate_news(interval: int):

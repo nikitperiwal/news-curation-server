@@ -4,6 +4,8 @@ import mongo_utils
 import schedule
 import constants
 
+url_in_db = set()
+
 
 def start_curating(interval: int):
     print("Curating at: ", datetime.now().strftime(constants.DATETIME_TO_STRING))
@@ -23,6 +25,7 @@ def schedule_curation(interval: int = constants.SCHEDULE_MINUTES):
 
 
 # TODO
+# reformat data
 # set url as the primary key.
 # think of a way to prevent same articles.
 # discard articles less than 45 words.
