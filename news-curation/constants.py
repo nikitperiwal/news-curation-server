@@ -12,7 +12,7 @@ LANGUAGE = "en"
 COUNTRY = "in"
 SOURCE_LIMIT = 25
 
-MAX_ARTICLE_LENGTH = 1000
+MAX_ARTICLE_LENGTH = 900
 SPLIT_REGEX = r"\w+(?:'\w+)?|[^\w\s]"
 
 # Scheduler
