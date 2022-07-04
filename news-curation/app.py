@@ -54,6 +54,8 @@ def schedule_curation(interval: int = constants.SCHEDULE_MINUTES):
     )
 
     read_urls()
+    start_curating(interval)
+
     while True:
         schedule.run_pending()
 

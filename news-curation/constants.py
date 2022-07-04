@@ -16,7 +16,7 @@ MAX_ARTICLE_LENGTH = 900
 SPLIT_REGEX = r"\w+(?:'\w+)?|[^\w\s]"
 
 # Scheduler
-SCHEDULE_MINUTES = 5
+SCHEDULE_MINUTES = 60
 
 # MongoDB Constants
 MONGO_URL = f"mongodb+srv://{mongo_username}:{mongo_password}@shortly.autde.mongodb.net/?retryWrites=true&w=majority"
