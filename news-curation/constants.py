@@ -2,6 +2,8 @@ import os
 import pytz
 from dotenv import load_dotenv
 
+load_dotenv()
+
 # Defining the constants to be used throughout the app
 DATETIME_TO_STRING = "%m/%d/%Y, %H:%M:%S"
 UTC_OFFSET = pytz.timezone('Asia/Kolkata')._utcoffset
