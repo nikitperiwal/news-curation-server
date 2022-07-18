@@ -69,7 +69,7 @@ def reformat_articles(articles: list):
     ----------
     articles: The list of articles
     """
-
+    # TODO fix this: the length
     def truncate_text(text):
         while len(re.findall(constants.SPLIT_REGEX, text)) > constants.MAX_ARTICLE_LENGTH:
             index = text.rfind(".")
